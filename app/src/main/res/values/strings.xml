@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Assignment2-100782317</string>
+    <string name="Done">Done</string>
+    <string name="AppTitle">LocationPinned</string>
+    <string name="hintsearch">Address</string>
+    <string name="latitude">latitude</string>
+    <string name="longitude">longitude</string>
+    <string name="Save">Save</string>
+    <string name="ViewAll">View All</string>
+    <string name="Add">Add</string>
+    <string name="discard">Discard</string>
+</resources>

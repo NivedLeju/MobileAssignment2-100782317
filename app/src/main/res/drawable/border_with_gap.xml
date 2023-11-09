@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- border_with_gap.xml -->
+    <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:drawable="@drawable/border_background" />
+        <item
+            android:left="8dp"
+            android:top="8dp"
+            android:right="8dp"
+            android:bottom="8dp">
+            <bitmap android:gravity="fill" android:src="@android:color/transparent" />
+        </item>
+    </layer-list>
+
+</selector>
