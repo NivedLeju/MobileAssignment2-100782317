@@ -25,11 +25,13 @@ import java.io.*;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
-       Button b1, add;
+       Button add;
        LinearLayout list;
        MyDatabaseHelper dbhelper;
        SQLiteDatabase database;
        TextView search;
+        double latitude, longitude;
+        String address2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,37 @@ public class MainActivity extends AppCompatActivity {
         search = findViewById(R.id.search);
         dbhelper = new MyDatabaseHelper(this);
         database = dbhelper.getWritableDatabase();
+        InputStream inputStream = getResources().openRawResource(R.raw.geocoding);
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(dbhelper.getCount()) {
+            try {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] coordinates = line.split(",");
+                    if (coordinates.length == 2) {
+                        latitude = Double.parseDouble(coordinates[0]);
+                        longitude = Double.parseDouble(coordinates[1]);
+                        address2 = getCompleteAddress(latitude, longitude);
+                        ContentValues values = new ContentValues();
+                        values.put(MyDatabaseHelper.COLUMN_ADDRESS, address2);
+                        values.put(MyDatabaseHelper.COLUMN_LONG, longitude);
+                        values.put(MyDatabaseHelper.COLUMN_LAT, latitude);
+
+                        database.insert(MyDatabaseHelper.TABLE_ADDRESS, null, values);
+                    } else {
+                        Toast.makeText(this, "invalid", Toast.LENGTH_LONG).show();
+                    }
+                }
+            } catch (IOException e) {
+                Toast.makeText(this, "Error reading file", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }
         displayNotes();
 
         search.addTextChangedListener(new TextWatcher() {
@@ -167,6 +200,28 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         cursor.close();
+    }
+
+    private String getCompleteAddress(double latitude, double longitude) {
+        String address = "";
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strToReturn = new StringBuilder("");
+
+                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strToReturn.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                address = strToReturn.toString();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return address;
+
     }
 
 }
